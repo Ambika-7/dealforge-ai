@@ -1,0 +1,28 @@
+{
+  "budget_policies": {
+    "maximum_allowed_budget": 10000000,
+    "budget_warning_threshold_percentage": 90
+  },
+  "compliance_rules": {
+    "minimum_warranty_years": 3,
+    "maximum_delivery_days": 15,
+    "mandatory_support_type": ["onsite", "remote"],
+    "mandatory_certifications": ["Authorized Reseller", "ISO 9001", "ISO 27001", "Premium Partner"]
+  },
+  "approval_policies": {
+    "manager_approval_threshold": 1000000,
+    "director_approval_threshold": 5000000,
+    "require_approval_if_non_compliant": true,
+    "require_approval_if_budget_exceeded": true,
+    "require_approval_if_terms_changed": true
+  },
+  "evaluation_weights": {
+    "price": 30,
+    "budget_fit": 20,
+    "warranty": 15,
+    "delivery": 15,
+    "support": 10,
+    "payment_terms": 5,
+    "compliance": 5
+  }
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "vendor_id": "V001",
+    "name": "TechPro Solutions",
+    "products_offered": ["laptop", "desktop", "server"],
+    "rating": 4.5,
+    "certifications": ["ISO 9001", "Authorized Reseller"],
+    "unit_price": 84000,
+    "warranty_years": 3,
+    "delivery_days": 10,
+    "support_type": "onsite",
+    "payment_terms_days": 15,
+    "discount_percentage": 0.0,
+    "availability": true
+  },
+  {
+    "vendor_id": "V002",
+    "name": "Global IT Supplies",
+    "products_offered": ["laptop", "networking", "accessories"],
+    "rating": 4.2,
+    "certifications": ["Authorized Reseller"],
+    "unit_price": 76000,
+    "warranty_years": 2,
+    "delivery_days": 20,
+    "support_type": "remote",
+    "payment_terms_days": 30,
+    "discount_percentage": 5.0,
+    "availability": true
+  },
+  {
+    "vendor_id": "V003",
+    "name": "Enterprise Hardware Hub",
+    "products_offered": ["laptop", "workstation"],
+    "rating": 4.8,
+    "certifications": ["ISO 27001", "Premium Partner"],
+    "unit_price": 90000,
+    "warranty_years": 4,
+    "delivery_days": 5,
+    "support_type": "onsite",
+    "payment_terms_days": 45,
+    "discount_percentage": 10.0,
+    "availability": true
+  },
+  {
+    "vendor_id": "V004",
+    "name": "Budget Computech",
+    "products_offered": ["laptop", "tablets"],
+    "rating": 3.9,
+    "certifications": [],
+    "unit_price": 65000,
+    "warranty_years": 1,
+    "delivery_days": 14,
+    "support_type": "remote",
+    "payment_terms_days": 15,
+    "discount_percentage": 2.0,
+    "availability": true
+  },
+  {
+    "vendor_id": "V005",
+    "name": "Swift Systems",
+    "products_offered": ["laptop", "monitors"],
+    "rating": 4.1,
+    "certifications": ["Authorized Reseller"],
+    "unit_price": 79000,
+    "warranty_years": 3,
+    "delivery_days": 12,
+    "support_type": "onsite",
+    "payment_terms_days": 30,
+    "discount_percentage": 0.0,
+    "availability": false
+  }
+]
