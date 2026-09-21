@@ -3,7 +3,9 @@ from typing import Dict, Any, Optional
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from backend.models.procurement_models import Requirement, ProcurementState
+from dotenv import load_dotenv
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -16,6 +18,9 @@ def get_llm():
     if provider == "gemini":
         actual_model = model_name if model_name and "gemini" in model_name.lower() else "gemini-1.5-flash"
         return ChatGoogleGenerativeAI(model=actual_model, temperature=0)
+    elif provider == "groq":
+        actual_model = model_name if model_name else "llama-3.1-8b-instant"
+        return ChatGroq(model=actual_model, temperature=0)
     else:
         # Default to OpenAI
         actual_model = model_name if model_name else "gpt-4o-mini"
