@@ -6,6 +6,9 @@ from backend.agents.vendor_research_agent import VendorResearchAgent
 from backend.agents.price_analysis_agent import PriceAnalysisAgent
 from backend.agents.budget_agent import BudgetAgent
 from backend.agents.compliance_agent import ComplianceAgent
+from backend.agents.deal_evaluation_agent import DealEvaluationAgent
+from backend.agents.negotiation_agent import NegotiationAgent
+from backend.agents.approval_agent import ApprovalAgent
 
 def test_requirement_agent():
     # Make sure we have an API key set for testing, otherwise skip
@@ -180,3 +183,152 @@ def test_compliance_agent():
     c_bad = state.compliance_analysis["V002"]
     assert c_bad["is_compliant"] is False
     assert len(c_bad["violated_rules"]) == 3 # Warranty, Delivery, Support
+
+def test_deal_evaluation_agent():
+    if not os.getenv("OPENAI_API_KEY") and not os.getenv("GEMINI_API_KEY"):
+        pytest.skip("No API keys found in environment, skipping LLM test.")
+        
+    state = ProcurementState(
+        vendor_quotes=[
+            {
+                "vendor_id": "V001",
+                "product_name": "laptop",
+                "unit_price": 84000.0,
+                "quantity": 50,
+                "warranty_years": 3,
+                "delivery_days": 10,
+                "support_type": "onsite",
+                "payment_terms_days": 15,
+                "discount_percentage": 5.0,
+                "availability": True
+            }
+        ],
+        price_analysis={
+            "V001": {
+                "payment_terms_score": 3
+            }
+        },
+        budget_analysis={
+            "V001": {
+                "within_budget": True,
+                "exceeded_amount": 0.0
+            }
+        },
+        compliance_analysis={
+            "V001": {
+                "is_compliant": True,
+                "violated_rules": [],
+                "warnings": []
+            }
+        }
+    )
+    
+    agent = DealEvaluationAgent()
+    state = agent.process_request(state)
+    
+    assert "V001" in state.deal_evaluation
+    eval_data = state.deal_evaluation["V001"]
+    
+    # Check quantitative
+    assert eval_data["total_score"] > 0
+    assert eval_data["budget_score"] == 10.0
+    
+    # Check qualitative from LLM
+    assert len(eval_data["strengths"]) > 0
+    assert eval_data["recommendation_rationale"] != ""
+
+def test_negotiation_agent():
+    if not os.getenv("OPENAI_API_KEY") and not os.getenv("GEMINI_API_KEY"):
+        pytest.skip("No API keys found in environment, skipping LLM test.")
+        
+    state = ProcurementState(
+        requirements=Requirement(
+            product="laptop",
+            quantity=50,
+            budget=4000000
+        ),
+        vendor_quotes=[
+            {
+                "vendor_id": "V002",
+                "product_name": "laptop",
+                "unit_price": 85000.0,
+                "quantity": 50,
+                "warranty_years": 2,
+                "delivery_days": 10,
+                "support_type": "remote",
+                "payment_terms_days": 15,
+                "discount_percentage": 0.0,
+                "availability": True
+            }
+        ],
+        deal_evaluation={
+            "V002": {
+                "total_score": 55.0,
+                "price_score": 5.0,
+                "budget_score": 0.0,
+                "warranty_score": 5.0,
+                "delivery_score": 8.0,
+                "support_score": 5.0,
+                "compliance_score": 0.0,
+                "strengths": ["Fast delivery"],
+                "weaknesses": ["Exceeds budget by 2.5 lakh", "Only 2 years warranty"],
+                "risks": ["Non-compliant warranty"],
+                "recommendation_rationale": "Over budget and weak warranty. Needs negotiation.",
+                "vendor_id": "V002"
+            }
+        }
+    )
+    
+    agent = NegotiationAgent()
+    state = agent.process_request(state, "V002")
+    
+    assert "V002" in state.negotiation_status
+    neg_data = state.negotiation_status["V002"]
+    
+    assert neg_data["target_price"] > 0
+    assert len(neg_data["requested_improvements"]) > 0
+    assert "dear" in neg_data["negotiation_email"].lower() or "hello" in neg_data["negotiation_email"].lower()
+
+def test_approval_agent():
+    state = ProcurementState(
+        request=ProcurementRequest(
+            request_id="REQ-001",
+            description="Laptops",
+            requested_by="Alice",
+            department="IT"
+        ),
+        requirements=Requirement(
+            product="laptop",
+            quantity=50,
+            budget=4000000
+        ),
+        price_analysis={
+            "V001": {
+                "total_cost": 4200000.0  # Over manager threshold (1M) and budget (4M)
+            }
+        },
+        budget_analysis={
+            "V001": {
+                "within_budget": False,
+                "exceeded_amount": 200000.0
+            }
+        },
+        compliance_analysis={
+            "V001": {
+                "is_compliant": False,
+                "violated_rules": ["Missing warranty"]
+            }
+        }
+    )
+    
+    agent = ApprovalAgent()
+    state = agent.process_request(state, "V001")
+    
+    assert "V001" in state.approval_status
+    status = state.approval_status["V001"]
+    
+    assert status["approval_required"] is True
+    details = status["request_details"]
+    assert details["risk_level"] == "High"
+    assert "warranty" in details["reason_for_approval"].lower()
+    assert details["approval_level_required"] == "Director"
