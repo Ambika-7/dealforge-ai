@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DealForge AI | Procurement Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-glow"></div>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <h1>DealForge <span>AI</span></h1>
+            </div>
+            <p class="subtitle">Multi-Agent Procurement & Negotiation</p>
+        </header>
+
+        <main>
+            <!-- Step 1: Submit Request -->
+            <section id="request-section" class="card fade-in">
+                <h2>New Procurement Request</h2>
+                <form id="procurement-form">
+                    <div class="input-group">
+                        <label for="description">What do you need?</label>
+                        <textarea id="description" rows="3" placeholder="E.g. We need 50 laptops under 40 lakh rupees. Must be 16GB RAM, minimum 3 years warranty..." required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="input-group">
+                            <label for="requested-by">Requested By</label>
+                            <input type="text" id="requested-by" placeholder="Alice" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="department">Department</label>
+                            <input type="text" id="department" placeholder="IT" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Initialize AI Agents</button>
+                </form>
+            </section>
+
+            <!-- Step 2: Loading State -->
+            <section id="loading-section" class="card hidden">
+                <div class="loader-container">
+                    <div class="spinner"></div>
+                    <h2 class="pulsate">AI Agents are Negotiating...</h2>
+                    <p id="loading-status">Analyzing requirements, researching vendors, and calculating budgets.</p>
+                </div>
+            </section>
+
+            <!-- Step 3: Results Dashboard -->
+            <section id="results-section" class="hidden fade-in">
+                <div class="dashboard-grid">
+                    
+                    <!-- Best Vendor -->
+                    <div class="card stat-card">
+                        <h3>Recommended Vendor</h3>
+                        <div class="vendor-id" id="res-vendor-id">V001</div>
+                        <p class="score-label">AI Deal Score: <span id="res-score" class="highlight">0</span>/100</p>
+                    </div>
+
+                    <!-- Requirements -->
+                    <div class="card">
+                        <h3>Parsed Requirements</h3>
+                        <ul class="req-list">
+                            <li><strong>Product:</strong> <span id="req-product"></span></li>
+                            <li><strong>Quantity:</strong> <span id="req-qty"></span></li>
+                            <li><strong>Max Budget:</strong> ₹<span id="req-budget"></span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Negotiation Strategy -->
+                    <div class="card full-width">
+                        <h3>AI Negotiation Strategy</h3>
+                        <div class="strategy-details">
+                            <div class="target-price">Target Price: <span id="neg-target-price"></span></div>
+                            <div class="rationale" id="neg-rationale"></div>
+                        </div>
+                        <div class="email-container">
+                            <h4>Drafted Email to Vendor</h4>
+                            <pre id="neg-email"></pre>
+                        </div>
+                    </div>
+
+                    <!-- Approval Status -->
+                    <div class="card full-width approval-card" id="approval-card">
+                        <h3>Approval Required</h3>
+                        <p id="app-reason" class="alert-text"></p>
+                        <div class="approval-actions">
+                            <button id="btn-approve" class="btn-success">Approve Deal</button>
+                            <button id="btn-reject" class="btn-danger">Reject</button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

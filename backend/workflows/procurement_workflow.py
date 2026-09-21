@@ -10,6 +10,8 @@ from backend.agents.compliance_agent import ComplianceAgent
 from backend.agents.deal_evaluation_agent import DealEvaluationAgent
 from backend.agents.negotiation_agent import NegotiationAgent
 from backend.agents.approval_agent import ApprovalAgent
+from backend.utils.logger import logger
+import time
 
 class GraphState(TypedDict):
     state_obj: ProcurementState
@@ -27,6 +29,16 @@ def build_procurement_graph():
     negotiation_agent = NegotiationAgent()
     approval_agent = ApprovalAgent()
 
+    def wrap_node(name, agent_func):
+        def wrapper(data: GraphState):
+            logger.info(f"Starting {name}...")
+            start = time.time()
+            new_state = agent_func(data)
+            elapsed = time.time() - start
+            logger.info(f"Finished {name} in {elapsed:.2f}s")
+            return new_state
+        return wrapper
+
     # Define Node Wrappers
     def extract_requirements(data: GraphState):
         new_state = req_agent.process_request(data["state_obj"])
@@ -36,8 +48,6 @@ def build_procurement_graph():
         new_state = vendor_agent.process_request(data["state_obj"])
         return {"state_obj": new_state}
         
-    # We execute these sequentially in the graph to ensure state safety,
-    # though conceptually they represent the "parallel" analysis phase.
     def analyze_price(data: GraphState):
         new_state = price_agent.process_request(data["state_obj"])
         return {"state_obj": new_state}
@@ -81,14 +91,14 @@ def build_procurement_graph():
         return {"state_obj": new_state}
 
     # Add Nodes
-    workflow.add_node("requirement", extract_requirements)
-    workflow.add_node("vendor_research", research_vendors)
-    workflow.add_node("price_analysis", analyze_price)
-    workflow.add_node("budget_analysis", check_budget)
-    workflow.add_node("compliance_analysis", check_compliance)
-    workflow.add_node("deal_evaluation", evaluate_deals)
-    workflow.add_node("negotiation", negotiate_deals)
-    workflow.add_node("approval", approve_deal)
+    workflow.add_node("requirement", wrap_node("RequirementAgent", extract_requirements))
+    workflow.add_node("vendor_research", wrap_node("VendorResearchAgent", research_vendors))
+    workflow.add_node("price_analysis", wrap_node("PriceAnalysisAgent", analyze_price))
+    workflow.add_node("budget_analysis", wrap_node("BudgetAgent", check_budget))
+    workflow.add_node("compliance_analysis", wrap_node("ComplianceAgent", check_compliance))
+    workflow.add_node("deal_evaluation", wrap_node("DealEvaluationAgent", evaluate_deals))
+    workflow.add_node("negotiation", wrap_node("NegotiationAgent", negotiate_deals))
+    workflow.add_node("approval", wrap_node("ApprovalAgent", approve_deal))
     
     # Define Edges
     workflow.set_entry_point("requirement")
