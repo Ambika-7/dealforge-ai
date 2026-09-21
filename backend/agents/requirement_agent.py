@@ -11,13 +11,15 @@ load_dotenv()
 
 def get_llm():
     provider = os.getenv("LLM_PROVIDER", "openai").lower()
-    model_name = os.getenv("LLM_MODEL", "gpt-4o-mini")
+    model_name = os.getenv("LLM_MODEL", "")
     
     if provider == "gemini":
-        return ChatGoogleGenerativeAI(model=model_name or "gemini-1.5-flash", temperature=0)
+        actual_model = model_name if model_name and "gemini" in model_name.lower() else "gemini-1.5-flash"
+        return ChatGoogleGenerativeAI(model=actual_model, temperature=0)
     else:
         # Default to OpenAI
-        return ChatOpenAI(model=model_name, temperature=0)
+        actual_model = model_name if model_name else "gpt-4o-mini"
+        return ChatOpenAI(model=actual_model, temperature=0)
 
 class RequirementAgent:
     def __init__(self):
