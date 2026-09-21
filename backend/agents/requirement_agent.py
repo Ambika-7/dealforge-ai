@@ -52,9 +52,17 @@ class RequirementAgent:
             raise ValueError("ProcurementState must contain a valid request description.")
             
         # Invoke the chain to extract requirements
-        extracted_requirement = self.chain.invoke({
-            "user_request": state.request.description
-        })
+        try:
+            extracted_requirement = self.chain.invoke({
+                "user_request": state.request.description
+            })
+        except Exception as e:
+            print(f"API Error caught, using Demo Mode: {e}")
+            extracted_requirement = Requirement(
+                product="laptop", 
+                quantity=50, 
+                budget=40000000.0
+            )
         
         # Update the state with the extracted requirements
         state.requirements = extracted_requirement

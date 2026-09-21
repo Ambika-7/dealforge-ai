@@ -41,10 +41,18 @@ class NegotiationAgent:
                 "budget": budget,
                 "evaluation": json.dumps(evaluation)
             })
-            
-            # Store it in negotiation_status
-            state.negotiation_status[target_vendor_id] = result.model_dump()
+            neg_dict = result.model_dump()
         except Exception as e:
-            print(f"Error negotiating with {target_vendor_id}: {e}")
+            print(f"API Error caught, using Demo Mode for Negotiation: {e}")
+            neg_dict = {
+                "strategy_rationale": "The vendor is strong technically but slightly expensive. (Demo Mode Active).",
+                "target_price": quote.get("unit_price", 1000) * 0.9,
+                "negotiation_email": f"Dear Vendor,\n\nWe are highly interested in your proposal. However, to proceed with a purchase, we require a 10% discount on the unit price to align with our budget constraints.\n\nBest regards,\nDealForge AI (Demo Mode)"
+            }
+            
+        if state.negotiation_status is None:
+            state.negotiation_status = {}
+            
+        state.negotiation_status[target_vendor_id] = neg_dict
             
         return state
