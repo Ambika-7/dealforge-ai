@@ -1,54 +1,44 @@
-# DealForge AI
-**Multi-Agent Procurement and Vendor Negotiation System**
+# DealForge AI - Multi-Agent Procurement System
 
-## Problem Statement
-Traditional procurement is a slow, manual process involving comparing multiple vendors, ensuring policies are met, negotiating prices, and seeking approvals. Humans can struggle to balance complex constraints (budget, warranty, delivery time) simultaneously for multiple vendors.
+DealForge AI is a state-of-the-art autonomous Multi-Agent Procurement and Vendor Negotiation System. It replaces traditional manual procurement by leveraging specialized AI agents orchestrated via LangGraph. 
 
-## Project Objective
-Build an agentic AI procurement system where multiple specialized AI agents collaborate to help a company purchase products/services from vendors. Instead of just picking the cheapest option, it holistically evaluates overall value and automatically negotiates better terms before seeking human approval.
+## Features
+- **Requirement Analysis**: Automatically parses natural language requests into structured procurement goals.
+- **Vendor Evaluation**: Mathematically scores vendors based on Price, Budget, Warranty, Delivery, and Compliance.
+- **Autonomous Negotiation**: Strategizes target prices and drafts negotiation emails to vendors based on identified weaknesses.
+- **Human-in-the-Loop Approval**: Enforces strict financial gating rules.
+- **Dynamic Replanning**: Intelligently handles unexpected budget cuts or vendor availability changes without restarting the workflow.
+- **Sleek UI**: Built-in responsive dashboard to track AI agent thought processes.
 
-## Architecture
-DealForge AI is a stateful multi-agent system built using LangGraph and FastAPI. It follows a decentralized but orchestrated approach where specialized agents communicate via a shared structured state.
+## Getting Started
 
-### Agent Workflow
-```mermaid
-graph TD
-    UserRequest[User Request] --> Coordinator[Procurement Coordinator]
-    Coordinator --> ReqAgent[Requirement Agent]
-    
-    ReqAgent --> VR[Vendor Research]
-    VR --> PA[Price Analysis]
-    VR --> BA[Budget Analysis]
-    VR --> CA[Compliance Analysis]
-    
-    PA --> Eval[Deal Evaluation]
-    BA --> Eval
-    CA --> Eval
-    
-    Eval --> Neg[Negotiation Agent]
-    Neg --> App[Approval Agent]
-    
-    App -- Approved --> Final[Final Procurement Plan]
-    App -- Requires Changes --> Neg
-    App -- Rejected --> End[Process Terminated]
+### Local Setup
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Ambika-7/dealforge-ai.git
+   cd dealforge-ai
+   ```
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Configure API Keys**:
+   Copy `.env.example` to `.env` and insert your OpenAI/Gemini API keys.
+4. **Run the Backend API**:
+   ```bash
+   uvicorn backend.main:app --reload
+   ```
+5. **View the Dashboard**:
+   Open `frontend/index.html` in your web browser.
+
+### Docker Setup
+To run the backend completely isolated:
+```bash
+docker build -t dealforge-ai .
+docker run -p 8000:8000 --env-file .env dealforge-ai
 ```
 
-### Why Multi-Agent?
-- **Separation of Concerns**: Each agent has a focused prompt and toolset, reducing hallucinations and improving task execution.
-- **Parallel Execution**: Vendor research, price, budget, and compliance checks can run concurrently, saving time.
-- **Dynamic Replanning**: If a constraint changes (e.g., budget drops), only affected agents need to rerun instead of restarting from scratch.
-- **Human-in-the-Loop**: An Approval Agent safely pauses execution before any binding purchase decisions are made.
-
-## Technology Stack
-- **Backend Framework**: FastAPI (High performance, excellent typing support via Pydantic).
-- **Agent Orchestration**: LangGraph (Stateful workflow, allows loops and conditional branching).
-- **LLM Interface**: LangChain (Extensible for OpenAI, Gemini, Groq).
-- **Data Models**: Pydantic (Strict typing for agent inputs and outputs).
-- **Frontend (Future)**: React / Streamlit.
-
-## Installation
-1. Clone the repository
-2. Create a virtual environment: `python -m venv venv`
-3. Activate the environment: `venv\Scripts\activate` (Windows) or `source venv/bin/activate` (Mac/Linux)
-4. Install dependencies: `pip install -r requirements.txt`
-5. Copy `.env.example` to `.env` and add your API keys.
+## Documentation
+- [Architecture](docs/architecture.md)
+- [Agent Workflows](docs/agent_workflows.md)
+- [API Reference](docs/api.md)
